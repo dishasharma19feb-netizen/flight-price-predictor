@@ -1,2 +1,3 @@
 # flight-price-predictor
 A machine learning web app that predicts airline ticket prices using an XGBoost regression model trained on 300,000+ real flight booking records.
+This project predicts airline ticket prices based on factors such as airline, source and destination city, travel class, number of stops, flight duration, and days left until departure. Six regression models were trained and compared (Linear Regression, Ridge, Lasso, Decision Tree, Random Forest, and XGBoost), with XGBoost achieving the best performance (R² = 0.983). The final model is deployed as an interactive web app built with Streamlit, allowing users to input flight details and get an instant price estimate.
