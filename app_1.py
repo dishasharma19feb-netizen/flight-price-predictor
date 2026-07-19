@@ -79,3 +79,5 @@ if st.button("Predict Price", type="primary", use_container_width=True):
 
     st.markdown("---")
     st.caption("Prediction made using an XGBoost regression model trained on 300,000+ real flight booking records.")
+
+  
