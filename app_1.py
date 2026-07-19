@@ -7,184 +7,256 @@ import joblib
 # Page Config
 # ─────────────────────────────────────────
 st.set_page_config(
-    page_title="Airline Price Predictor",
-    page_icon="✈️",
+    page_title="Airline Ticket Price Predictor",
+    page_icon="🎫",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ─────────────────────────────────────────
-# Custom CSS
+# Custom CSS — Boarding Pass / Departure Board theme
 # ─────────────────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Manrope', sans-serif;
     }
 
-    /* App background */
     .stApp {
-        background:
-            radial-gradient(circle at 15% 10%, rgba(124, 58, 237, 0.18) 0%, transparent 40%),
-            radial-gradient(circle at 85% 0%, rgba(236, 72, 153, 0.14) 0%, transparent 40%),
-            radial-gradient(circle at 50% 100%, rgba(20, 184, 166, 0.10) 0%, transparent 45%),
-            #0f1117;
+        background-color: #F6F8FB;
     }
 
-    /* Hero */
-    .hero {
+    /* ── Hero ── */
+    .eyebrow {
         text-align: center;
-        padding: 1.6rem 0 0.6rem 0;
+        color: #E8A33D;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 2.2px;
+        margin-bottom: 0.6rem;
     }
 
     .hero h1 {
-        font-family: 'Poppins', sans-serif;
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: linear-gradient(90deg, #818cf8, #c084fc, #f472b6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 0.3rem;
-        letter-spacing: -0.5px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 2.3rem;
+        color: #0B2545;
+        text-align: center;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero h1 span {
+        color: #E8A33D;
     }
 
     .hero p {
-        color: #9aa3b5;
-        font-size: 1.05rem;
-        margin-top: 0;
-        font-weight: 400;
+        text-align: center;
+        color: #5B6472;
+        font-size: 1rem;
+        max-width: 480px;
+        margin: 0 auto 1.4rem auto;
+        line-height: 1.5;
     }
 
-    /* Badges */
-    .badge-row {
+    /* ── Trust tags ── */
+    .tag-row {
         display: flex;
         justify-content: center;
-        gap: 0.7rem;
-        margin: 1rem 0 2rem 0;
+        gap: 0.6rem;
+        margin-bottom: 2rem;
         flex-wrap: wrap;
     }
 
-    .badge {
-        background: rgba(129, 140, 248, 0.12);
-        color: #c4b5fd;
-        padding: 0.4rem 1.1rem;
-        border-radius: 999px;
-        font-size: 0.82rem;
+    .tag {
+        background: #ffffff;
+        color: #0B2545;
+        border: 1px solid #DCE2EC;
+        padding: 0.35rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
         font-weight: 600;
-        border: 1px solid rgba(129, 140, 248, 0.3);
-        letter-spacing: 0.2px;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
     }
 
-    /* Real container card (via st.container(key=...)) */
-    .st-key-flight_form {
-        background: rgba(255, 255, 255, 0.035);
-        border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 20px;
-        padding: 1.8rem 1.8rem 1.2rem 1.8rem;
-        backdrop-filter: blur(12px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    .tag::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #E8A33D;
+        display: inline-block;
     }
 
-    .section-title {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 1.15rem;
-        color: #e5e7eb;
-        margin-bottom: 1.1rem;
+    /* ── Boarding pass card ── */
+    .st-key-boarding_pass {
+        background: #ffffff;
+        border: 1px solid #E4E9F0;
+        border-radius: 18px;
+        padding: 1.7rem 1.9rem 1.5rem 1.9rem;
+        box-shadow: 0 12px 28px rgba(11, 37, 69, 0.06);
     }
 
-    /* Labels */
+    .pass-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.3rem;
+        padding-bottom: 0.9rem;
+        border-bottom: 1px solid #EEF1F6;
+    }
+
+    .pass-header .label {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #0B2545;
+        letter-spacing: 1.5px;
+    }
+
+    .pass-header .icon {
+        font-size: 1.1rem;
+    }
+
+    /* Field labels (widget labels) */
     label, .stSlider label, .stNumberInput label, .stSelectbox label {
-        color: #b8bfcc !important;
-        font-weight: 500 !important;
-        font-size: 0.9rem !important;
+        color: #5B6472 !important;
+        font-weight: 700 !important;
+        font-size: 0.72rem !important;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
     }
 
-    /* Selectbox / number input styling */
     div[data-baseweb="select"] > div {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: #FBFCFE !important;
+        border-radius: 8px !important;
+        border: 1px solid #DCE2EC !important;
     }
 
     div[data-baseweb="select"] > div:hover {
-        border: 1px solid rgba(167, 139, 250, 0.5) !important;
+        border: 1px solid #E8A33D !important;
     }
 
     .stNumberInput input {
-        background-color: rgba(255, 255, 255, 0.05) !important;
-        border-radius: 10px !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        color: #e5e7eb !important;
+        background-color: #FBFCFE !important;
+        border-radius: 8px !important;
+        border: 1px solid #DCE2EC !important;
+        color: #0B2545 !important;
     }
 
-    /* Slider accent */
     .stSlider [data-baseweb="slider"] div[role="slider"] {
-        background-color: #a78bfa !important;
+        background-color: #E8A33D !important;
+        border: 3px solid #ffffff !important;
+        box-shadow: 0 0 0 1px #E8A33D !important;
     }
 
-    /* Button */
+    /* ── Perforation divider ── */
+    .perforation {
+        position: relative;
+        border-top: 2px dashed #DCE2EC;
+        margin: 1.5rem 0 1.3rem 0;
+    }
+
+    .perforation::before, .perforation::after {
+        content: "";
+        position: absolute;
+        top: -5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #E8A33D;
+    }
+
+    .perforation::before { left: 0; }
+    .perforation::after { right: 0; }
+
+    /* ── Button ── */
     .stButton>button {
-        background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
-        background-size: 200% auto;
-        color: white;
+        background: #E8A33D;
+        color: #0B2545;
         border: none;
-        border-radius: 12px;
-        padding: 0.8rem 0;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 1.02rem;
+        border-radius: 10px;
+        padding: 0.75rem 0;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         width: 100%;
-        margin-top: 0.6rem;
-        transition: all 0.35s ease;
-        box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+        transition: all 0.25s ease;
     }
 
     .stButton>button:hover {
-        background-position: right center;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+        background: #D6912E;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(232, 163, 61, 0.4);
     }
 
-    /* Result card */
-    .result-card {
-        background: linear-gradient(135deg, #4f46e5, #9333ea, #db2777);
-        border-radius: 20px;
-        padding: 2rem;
-        text-align: center;
-        color: white;
-        margin-top: 1.4rem;
-        box-shadow: 0 12px 32px rgba(139, 92, 246, 0.35);
-        animation: fadeIn 0.5s ease;
+    /* ── Result stub (departure board) ── */
+    .st-key-result_stub {
+        background: #0B2545;
+        border-radius: 18px;
+        padding: 1.8rem 1.9rem;
+        margin-top: 1.3rem;
+        box-shadow: 0 16px 32px rgba(11, 37, 69, 0.25);
+        animation: revealStub 0.5s ease;
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
+    @keyframes revealStub {
+        from { opacity: 0; transform: translateY(10px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .result-label {
-        font-size: 0.95rem;
-        opacity: 0.85;
-        margin-bottom: 0.4rem;
-        font-weight: 500;
+    .stub-label {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #7C93B3;
+        margin-bottom: 0.5rem;
     }
 
-    .result-price {
-        font-family: 'Poppins', sans-serif;
-        font-size: 2.8rem;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.5px;
+    .stub-price {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 2.6rem;
+        color: #F2B84D;
+        letter-spacing: 1px;
+        margin: 0 0 0.6rem 0;
     }
 
+    .stub-route {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        color: #B9C6DA;
+        margin-bottom: 0.9rem;
+    }
+
+    .deal-badge {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        border-radius: 7px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .deal-great { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+    .deal-fair  { background: rgba(242, 184, 77, 0.15); color: #F2B84D; }
+    .deal-premium { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+
+    /* ── Footer ── */
     .footer-note {
         text-align: center;
-        color: #6b7280;
-        font-size: 0.82rem;
-        margin-top: 1.8rem;
+        color: #99A3B5;
+        font-size: 0.78rem;
+        margin-top: 1.6rem;
+        font-family: 'JetBrains Mono', monospace;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -198,46 +270,55 @@ def load_assets():
     scaler = joblib.load('scaler.pkl')
     feature_columns = joblib.load('feature_columns.pkl')
     options = joblib.load('dropdown_options.pkl')
-    return model, scaler, feature_columns, options
+    price_stats = joblib.load('price_stats.pkl')
+    return model, scaler, feature_columns, options, price_stats
 
-model, scaler, feature_columns, options = load_assets()
+model, scaler, feature_columns, options, price_stats = load_assets()
 
 # ─────────────────────────────────────────
-# Hero Section
+# Hero
 # ─────────────────────────────────────────
 st.markdown("""
+<div class="eyebrow">FARE PREDICTION ENGINE</div>
 <div class="hero">
-    <h1>✈️ Airline Ticket Price Predictor</h1>
-    <p>Get an instant fare estimate powered by machine learning</p>
+    <h1>Know Your <span>Fare</span> Before You Book</h1>
+    <p>Instant Indian domestic airfare estimates from an XGBoost model trained on 300,000+ real flight bookings.</p>
 </div>
-<div class="badge-row">
-    <span class="badge">⚡ XGBoost Model</span>
-    <span class="badge">🎯 R² Score: 0.98</span>
-    <span class="badge">📊 300K+ Flights Trained</span>
+<div class="tag-row">
+    <span class="tag">XGBoost Model</span>
+    <span class="tag">R² Score 0.98</span>
+    <span class="tag">300K+ Flights</span>
 </div>
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────
-# Input Form (real container this time)
+# Boarding Pass Input Card
 # ─────────────────────────────────────────
-with st.container(key="flight_form"):
-    st.markdown('<div class="section-title">🛫 Flight Details</div>', unsafe_allow_html=True)
+with st.container(key="boarding_pass"):
+    st.markdown("""
+    <div class="pass-header">
+        <span class="label">BOARDING PASS · FLIGHT DETAILS</span>
+        <span class="icon">🎫</span>
+    </div>
+    """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
+        source_city = st.selectbox("From", options['source_city'])
         airline = st.selectbox("Airline", options['airline'])
-        source_city = st.selectbox("Source City", options['source_city'])
-        destination_city = st.selectbox("Destination City", options['destination_city'])
-        travel_class = st.selectbox("Class", options['class'])
-    with col2:
         departure_time = st.selectbox("Departure Time", options['departure_time'])
+        stops = st.selectbox("Stops", options['stops'])
+    with col2:
+        destination_city = st.selectbox("To", options['destination_city'])
+        travel_class = st.selectbox("Class", options['class'])
         arrival_time = st.selectbox("Arrival Time", options['arrival_time'])
-        stops = st.selectbox("Number of Stops", options['stops'])
-        duration = st.number_input("Flight Duration (hrs)", min_value=0.5, max_value=50.0, value=2.5, step=0.5)
+        duration = st.number_input("Duration (hrs)", min_value=0.5, max_value=50.0, value=2.5, step=0.5)
 
     days_left = st.slider("Days Left Until Departure", min_value=1, max_value=49, value=15)
 
-    predict_clicked = st.button("Predict Price")
+    st.markdown('<div class="perforation"></div>', unsafe_allow_html=True)
+
+    predict_clicked = st.button("Estimate My Fare  →")
 
 # ─────────────────────────────────────────
 # Prediction Logic
@@ -269,23 +350,40 @@ def predict_price(airline, source_city, destination_city, departure_time,
     prediction = model.predict(input_df)[0]
     return max(0, prediction)
 
+def get_deal_badge(price, travel_class):
+    stats = price_stats.get(travel_class)
+    if not stats:
+        return None
+    if price <= stats['q25']:
+        return ("Great Deal", "deal-great")
+    elif price <= stats['q75']:
+        return ("Fair Price", "deal-fair")
+    else:
+        return ("Premium Fare", "deal-premium")
+
 # ─────────────────────────────────────────
-# Result
+# Result Stub
 # ─────────────────────────────────────────
 if predict_clicked:
-    with st.spinner("Calculating best estimate..."):
+    with st.spinner("Calculating..."):
         price = predict_price(airline, source_city, destination_city, departure_time,
                                arrival_time, stops, travel_class, duration, days_left)
 
-    st.markdown(f"""
-    <div class="result-card">
-        <div class="result-label">Estimated Ticket Price</div>
-        <p class="result-price">₹ {price:,.0f}</p>
-    </div>
-    """, unsafe_allow_html=True)
+    badge = get_deal_badge(price, travel_class)
+    badge_html = f'<span class="deal-badge {badge[1]}">{badge[0]}</span>' if badge else ""
+
+    stops_label = {"zero": "Non-stop", "one": "1 Stop", "two_or_more": "2+ Stops"}.get(stops, stops)
+
+    with st.container(key="result_stub"):
+        st.markdown(f"""
+        <div class="stub-label">Estimated Fare</div>
+        <p class="stub-price">₹ {price:,.0f}</p>
+        <div class="stub-route">{source_city.upper()[:3]} → {destination_city.upper()[:3]}  ·  {travel_class}  ·  {stops_label}  ·  {days_left}d out</div>
+        {badge_html}
+        """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="footer-note">Prediction powered by an XGBoost regression model trained on 300,000+ real flight booking records.</div>
+<div class="footer-note">MODEL: XGBOOST · R² 0.98 · 300,000+ FLIGHTS</div>
 """, unsafe_allow_html=True)
 
   
