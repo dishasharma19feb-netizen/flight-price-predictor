@@ -9,7 +9,6 @@ import plotly.graph_objects as go
 # ─────────────────────────────────────────
 st.set_page_config(
     page_title="SkyFare Price Predictor",
-    page_icon="🛫",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
@@ -20,6 +19,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://api.fontshare.com/v2/css?f[]=general-sans@500,600,700&display=swap');
 
     :root {
         --primary: #0047AB;
@@ -59,12 +59,13 @@ st.markdown("""
     }
 
     .hero h1 {
-        font-weight: 800;
+        font-family: 'General Sans', 'Inter', sans-serif;
+        font-weight: 700;
         font-size: 2.35rem;
         color: #ffffff;
         text-shadow: 0 2px 18px rgba(0, 20, 60, 0.25);
         margin-bottom: 0.4rem;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.8px;
     }
 
     .hero p {
@@ -87,13 +88,24 @@ st.markdown("""
     }
 
     .card-title {
-        font-weight: 700;
+        font-family: 'General Sans', 'Inter', sans-serif;
+        font-weight: 600;
         font-size: 1.05rem;
         color: var(--heading);
         margin-bottom: 1.1rem;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.6rem;
+        letter-spacing: -0.2px;
+    }
+
+    .card-title::before {
+        content: "";
+        width: 4px;
+        height: 1.1rem;
+        background: var(--secondary);
+        border-radius: 2px;
+        display: inline-block;
     }
 
     /* ── Labels & inputs ── */
@@ -156,10 +168,12 @@ st.markdown("""
     }
 
     .price-value {
+        font-family: 'General Sans', 'Inter', sans-serif;
         font-size: 2.6rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--primary);
         margin: 0 0 0.9rem 0;
+        letter-spacing: -0.5px;
     }
 
     /* ── Recommendation badge ── */
@@ -183,6 +197,16 @@ st.markdown("""
         background: rgba(217, 119, 6, 0.12);
         color: var(--warning);
         border: 1px solid rgba(217, 119, 6, 0.25);
+    }
+
+    .rec-badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        min-width: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
     }
 
     /* ── Footer ── */
@@ -214,7 +238,7 @@ model, scaler, feature_columns, options = load_assets()
 # ─────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <h1>🛫 SkyFare Price Predictor</h1>
+    <h1>SkyFare Price Predictor</h1>
     <p>Search a route to get an instant fare estimate and a 30-day price forecast.</p>
 </div>
 """, unsafe_allow_html=True)
@@ -223,7 +247,7 @@ st.markdown("""
 # Search Card
 # ─────────────────────────────────────────
 with st.container(key="search_card"):
-    st.markdown('<div class="card-title">🔍 Search Flights</div>', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">Search Flights</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -292,7 +316,7 @@ if predict_clicked:
     is_good_time = price <= min_price * 1.03
 
     with st.container(key="result_card"):
-        st.markdown('<div class="card-title">🎫 Your Estimated Fare</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">Your Estimated Fare</div>', unsafe_allow_html=True)
         st.markdown(f"""
         <div class="price-label">{source_city} → {destination_city} · {travel_class} · {days_left} days out</div>
         <p class="price-value">₹ {price:,.0f}</p>
@@ -300,16 +324,16 @@ if predict_clicked:
 
         if is_good_time:
             st.markdown("""
-            <div class="rec-badge rec-buy">✅ Buy Now — this is close to the best price in the next 30 days.</div>
+            <div class="rec-badge rec-buy">Buy Now — this is close to the best price in the next 30 days.</div>
             """, unsafe_allow_html=True)
         else:
             savings = price - min_price
             st.markdown(f"""
-            <div class="rec-badge rec-wait">⏳ Wait — fares are typically ₹{savings:,.0f} cheaper around {min_day} days before departure.</div>
+            <div class="rec-badge rec-wait">Wait — fares are typically ₹{savings:,.0f} cheaper around {min_day} days before departure.</div>
             """, unsafe_allow_html=True)
 
     with st.container(key="forecast_card"):
-        st.markdown('<div class="card-title">📈 30-Day Price Forecast</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">30-Day Price Forecast</div>', unsafe_allow_html=True)
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(
@@ -340,5 +364,3 @@ if predict_clicked:
 st.markdown("""
 <div class="footer-note">Model: XGBoost · R² 0.98 · Trained on 300,000+ real flight bookings</div>
 """, unsafe_allow_html=True)
-
-  
